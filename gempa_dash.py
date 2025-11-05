@@ -20,6 +20,19 @@ provinsi_list = [
 ]
 
 # --- Deteksi provinsi di kolom 'place' ---
+import pandas as pd
+import re
+
+# Load dataset kota dunia
+world = pd.read_csv("data/worldcities.csv")
+
+# Ambil hanya yang dari Indonesia
+indonesia = world[world['country'] == 'Indonesia'][['city_ascii', 'admin_name']].dropna()
+
+# Ubah ke dict mapping kota → provinsi
+city_to_province = dict(zip(indonesia['city_ascii'].str.lower(), indonesia['admin_name']))
+
+# Daftar provinsi valid untuk dropdown
 provinsi_list = sorted(indonesia['admin_name'].unique().tolist())
 
 def detect_province(place):
@@ -276,4 +289,3 @@ def update_dashboard(provinces, mag_range, start_date, end_date, clusters):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
