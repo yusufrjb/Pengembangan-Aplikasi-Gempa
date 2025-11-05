@@ -20,17 +20,26 @@ provinsi_list = [
 ]
 
 # --- Deteksi provinsi di kolom 'place' ---
+provinsi_list = sorted(indonesia['admin_name'].unique().tolist())
+
 def detect_province(place):
-    if not isinstance(place, str) or not place.strip():
+    """Deteksi provinsi berdasarkan nama kota yang muncul di kolom place."""
+    if not isinstance(place, str):
         return "Lainnya"
+
     place_clean = place.lower()
-    for p in provinsi_list:
-        pattern = r"\b" + re.escape(p.lower()) + r"\b"
-        if re.search(pattern, place_clean):
-            return p
+    
+    # 1️⃣ Cek nama kota di mapping
+    for city, prov in city_to_province.items():
+        if re.search(r"\b" + re.escape(city) + r"\b", place_clean):
+            return prov
+
+    # 2️⃣ Jika tidak ditemukan
     return "Lainnya"
 
 df["province"] = df["place"].apply(detect_province)
+
+print(df[["place", "province"]].head())
 
 # === Setup aplikasi ===
 app = dash.Dash(
@@ -267,3 +276,4 @@ def update_dashboard(provinces, mag_range, start_date, end_date, clusters):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
